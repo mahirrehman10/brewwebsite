@@ -1,0 +1,24 @@
+- name: Deploy Nginx Website 
+  hosts: webserver
+  become: yes
+  tasks:
+    - name: Ensure Docker is installed
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Pull the latest Docker image from Docker Hub
+      command: docker pull mahirrehman10/proj1:settingupwebiste
+
+    - name: Stop and remove the existing container (if any)
+      command: docker rm -f nginx_container
+      ignore_errors: yes
+
+    - name: Run the new Nginx container
+      command: docker run -d -p 80:80 --name nginx_container mahirrehman10/proj1:settingupwebiste
+
+    - name: Verify container is running
+      command: docker ps -a | grep nginx_container
+      register: container_status
+    - debug:
+        var: container_status.stdout_lines
