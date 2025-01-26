@@ -1,0 +1,25 @@
+name: Deploy with Ansible
+
+on:
+  push:
+    branches:
+      - main  # Trigger deployment on push to the main branch
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Ansible
+        run: sudo apt update && sudo apt install -y ansible sshpass
+
+      - name: Deploy with Ansible
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"
+        run: |
+          ansible-playbook -i inventory.ini deploy-playbook.yml \
+          --extra-vars "ansible_ssh_private_key='${{ secrets.SSH_PRIVATE_KEY }}'"
